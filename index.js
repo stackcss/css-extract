@@ -1,3 +1,4 @@
+const ConcatStream = require('concat-stream')
 const isRequire = require('is-require')()
 const through = require('through2')
 const falafel = require('falafel')
@@ -25,7 +26,7 @@ function cssExtract (bundle, opts) {
     bundle.pipeline.get('debug').unshift(through.obj(write, flush))
     const writeStream = (typeof outFile === 'function')
       ? outFile()
-      : fs.createWriteStream(outFile)
+      : ConcatStream(writeOutFile)
 
     function write (chunk, enc, cb) {
       const css = extract(chunk)
@@ -38,6 +39,10 @@ function cssExtract (bundle, opts) {
       writeStream.end()
       cb()
     }
+  }
+
+  function writeOutFile (buffer) {
+    fs.writeFileSync(outFile, buffer)
   }
 }
 
