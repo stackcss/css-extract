@@ -54,6 +54,8 @@ function extract (chunk) {
     if (!node.arguments) return
     if (!node.arguments[0]) return
     if (node.arguments[0].value !== 'insert-css') return
+    if (!node.parent.arguments || !node.parent.arguments[0]) return
+
     css.push(node.parent.arguments[0].value)
     node.parent.update('0')
   }
