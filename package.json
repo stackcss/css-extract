@@ -1,6 +1,6 @@
 {
   "name": "css-extract",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Extract CSS from a browserify bundle",
   "main": "index.js",
   "scripts": {
