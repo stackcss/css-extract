@@ -1,7 +1,6 @@
 const ConcatStream = require('concat-stream')
-const isRequire = require('is-require')()
+const staticModule = require('static-module')
 const through = require('through2')
-const falafel = require('falafel')
 const assert = require('assert')
 const fs = require('fs')
 
@@ -22,16 +21,28 @@ function cssExtract (bundle, opts) {
   addHooks()
 
   function addHooks () {
-    // run before the "debug" step in browserify pipeline
-    bundle.pipeline.get('debug').unshift(through.obj(write, flush))
     const writeStream = (typeof outFile === 'function')
       ? outFile()
-      : ConcatStream(writeOutFile)
+      : ConcatStream(fs.writeFileSync.bind(fs, outFile))
+
+    // run before the "label" step in browserify pipeline
+    // this makes sure insert-css requires are found before plugins like bundle-collapser run
+    bundle.pipeline.get('label').unshift(through.obj(write, flush))
 
     function write (chunk, enc, cb) {
-      const css = extract(chunk)
-      writeStream.write(css)
-      cb(null, chunk)
+      // A small performance boost: don't do ast parsing unless we know it's needed
+      if (String(chunk.source).indexOf('insert-css') === -1) {
+        return cb(null, chunk)
+      }
+
+      var sm = createStaticModule(writeStream)
+      sm.write(chunk.source)
+      sm.pipe(ConcatStream(function (source) {
+        // chunk.source is expected to be a string
+        chunk.source = String(source)
+        cb(null, chunk)
+      }))
+      sm.end()
     }
 
     // close stream and signal end
@@ -40,29 +51,10 @@ function cssExtract (bundle, opts) {
       cb()
     }
   }
-
-  function writeOutFile (buffer) {
-    fs.writeFileSync(outFile, buffer)
-  }
 }
 
-// extract css from chunks
-// obj -> str
-function extract (chunk) {
-  // Do a performant check before building the ast
-  if (String(chunk.source).indexOf('insert-css') === -1) return ''
-
-  const css = []
-  const ast = falafel(chunk.source, { ecmaVersion: 6 }, walk)
-  chunk.source = ast.toString()
-  return css.join('\n')
-
-  function walk (node) {
-    if (!isRequire(node)) return
-    if (!node.arguments) return
-    if (!node.arguments[0]) return
-    if (node.arguments[0].value !== 'insert-css') return
-    css.push(node.parent.arguments[0].value)
-    node.parent.update('0')
-  }
+function createStaticModule (writeStream) {
+  return staticModule({
+    'insert-css': writeStream.write.bind(writeStream)
+  })
 }
