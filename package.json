@@ -21,8 +21,7 @@
   "license": "MIT",
   "dependencies": {
     "concat-stream": "^1.5.1",
-    "falafel": "^1.2.0",
-    "is-require": "0.0.1",
+    "static-module": "^1.3.0",
     "through2": "^2.0.1"
   },
   "devDependencies": {

@@ -14,7 +14,7 @@ test('css-extract', function (t) {
     t.throws(cssExtract.bind(null, {}), 123, /object/)
   })
 
-  t.test('should extract css', function (t) {
+  t.test('should extract sheetify css to given stream', function (t) {
     t.plan(2)
     browserify(path.join(__dirname, 'source.js'))
       .transform('sheetify/transform')
@@ -31,7 +31,7 @@ test('css-extract', function (t) {
     }
   })
 
-  t.test('should write file', function (t) {
+  t.test('should extract sheetify css to file', function (t) {
     t.plan(3)
     tmpDir({unsafeCleanup: true}, onDir)
 
@@ -52,6 +52,44 @@ test('css-extract', function (t) {
 
           cleanup()
         })
+    }
+  })
+
+  t.test('should extract static insert-css statements', function (t) {
+    t.plan(2)
+    browserify(path.join(__dirname, 'source-static.js'))
+      .plugin(cssExtract, { out: createWs })
+      .bundle()
+
+    function createWs () {
+      return bl(function (err, data) {
+        t.ifError(err, 'no error')
+        const exPath = path.join(__dirname, './expected-static.css')
+        const expected = fs.readFileSync(exPath, 'utf8').trim()
+        t.equal(String(data), expected, 'extracted all the CSS')
+      })
+    }
+  })
+
+  t.test('should not extract dynamic insert-css statements', function (t) {
+    t.plan(4)
+    const sourcePath = path.join(__dirname, 'source-dynamic.js')
+
+    browserify(sourcePath)
+      .plugin(cssExtract, { out: readCss })
+      .bundle(readJs)
+
+    function readCss () {
+      return bl(function (err, data) {
+        t.ifError(err, 'no error')
+        t.equal(String(data), '', 'no css extracted')
+      })
+    }
+
+    function readJs (err, data) {
+      t.ifError(err, 'no error')
+      const source = fs.readFileSync(sourcePath, 'utf8')
+      t.ok(String(data).indexOf(String(source)) !== -1, 'source is still in built bundle')
     }
   })
 })
