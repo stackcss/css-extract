@@ -1,7 +1,8 @@
-const ConcatStream = require('concat-stream')
 const staticModule = require('static-module')
+const from2 = require('from2-string')
 const through = require('through2')
 const assert = require('assert')
+const bl = require('bl')
 const fs = require('fs')
 
 module.exports = cssExtract
@@ -21,28 +22,34 @@ function cssExtract (bundle, opts) {
   addHooks()
 
   function addHooks () {
+    const extractStream = through.obj(write, flush)
     const writeStream = (typeof outFile === 'function')
       ? outFile()
-      : ConcatStream(fs.writeFileSync.bind(fs, outFile))
+      : bl(writeComplete)
 
-    // run before the "label" step in browserify pipeline
-    // this makes sure insert-css requires are found before plugins like bundle-collapser run
-    bundle.pipeline.get('label').unshift(through.obj(write, flush))
+    // run before the "debug" step in browserify pipeline
+    bundle.pipeline.get('debug').unshift(extractStream)
 
     function write (chunk, enc, cb) {
-      // A small performance boost: don't do ast parsing unless we know it's needed
+      // Performance boost: don't do ast parsing unless we know it's needed
       if (String(chunk.source).indexOf('insert-css') === -1) {
         return cb(null, chunk)
       }
 
-      var sm = createStaticModule(writeStream)
-      sm.write(chunk.source)
-      sm.pipe(ConcatStream(function (source) {
-        // chunk.source is expected to be a string
+      var source = from2(chunk.source)
+      var sm = staticModule({
+        'insert-css': function (src) {
+          writeStream.write(String(src))
+        }
+      })
+
+      source.pipe(sm).pipe(bl(complete))
+
+      function complete (err, source) {
+        if (err) return extractStream.emit('error', err)
         chunk.source = String(source)
         cb(null, chunk)
-      }))
-      sm.end()
+      }
     }
 
     // close stream and signal end
@@ -50,11 +57,10 @@ function cssExtract (bundle, opts) {
       writeStream.end()
       cb()
     }
-  }
-}
 
-function createStaticModule (writeStream) {
-  return staticModule({
-    'insert-css': writeStream.write.bind(writeStream)
-  })
+    function writeComplete (err, buffer) {
+      if (err) return extractStream.emit('error', err)
+      fs.writeFileSync(outFile, buffer)
+    }
+  }
 }
