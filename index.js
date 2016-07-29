@@ -40,6 +40,7 @@ function cssExtract (bundle, opts) {
       var sm = staticModule({
         'insert-css': function (src) {
           writeStream.write(String(src))
+          return from2('null')
         }
       })
 

@@ -26,7 +26,6 @@
     "through2": "^2.0.1"
   },
   "devDependencies": {
-    "bl": "^1.1.2",
     "browserify": "^13.0.0",
     "dependency-check": "^2.5.1",
     "insert-css": "^0.2.0",
