@@ -27,8 +27,8 @@ function cssExtract (bundle, opts) {
       ? outFile()
       : bl(writeComplete)
 
-    // run before the "debug" step in browserify pipeline
-    bundle.pipeline.get('debug').unshift(extractStream)
+    // run before the "label" step in browserify pipeline
+    bundle.pipeline.get('label').unshift(extractStream)
 
     function write (chunk, enc, cb) {
       // Performance boost: don't do ast parsing unless we know it's needed
