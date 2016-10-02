@@ -39,7 +39,7 @@ function cssExtract (bundle, opts) {
       var source = from2(chunk.source)
       var sm = staticModule({
         'insert-css': function (src) {
-          writeStream.write(String(src) + '\n\n')
+          writeStream.write(String(src) + '\n')
           return from2('null')
         }
       })
