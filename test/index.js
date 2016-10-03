@@ -25,7 +25,7 @@ test('css-extract', function (t) {
       return bl(function (err, data) {
         t.ifError(err, 'no error')
         const exPath = path.join(__dirname, './expected.css')
-        const expected = fs.readFileSync(exPath, 'utf8').trim()
+        const expected = fs.readFileSync(exPath, 'utf8').trim() + '\n'
         t.equal(String(data), expected, 'extracted all the CSS')
       })
     }
@@ -65,7 +65,7 @@ test('css-extract', function (t) {
       return bl(function (err, data) {
         t.ifError(err, 'no error')
         const exPath = path.join(__dirname, './expected-static.css')
-        const expected = fs.readFileSync(exPath, 'utf8').trim()
+        const expected = fs.readFileSync(exPath, 'utf8').trim() + '\n'
         t.equal(String(data), expected, 'extracted all the CSS')
       })
     }
