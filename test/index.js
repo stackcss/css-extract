@@ -71,6 +71,22 @@ test('css-extract', function (t) {
     }
   })
 
+  t.test('should extract static sheetify/insert statements', function (t) {
+    t.plan(2)
+    browserify(path.join(__dirname, 'source-sf-static.js'))
+      .plugin(cssExtract, { out: createWs })
+      .bundle()
+
+    function createWs () {
+      return bl(function (err, data) {
+        t.ifError(err, 'no error')
+        const exPath = path.join(__dirname, './expected-sf-static.css')
+        const expected = fs.readFileSync(exPath, 'utf8').trim() + '\n'
+        t.equal(String(data), expected, 'extracted all the CSS')
+      })
+    }
+  })
+
   t.test('should not extract dynamic insert-css statements', function (t) {
     t.plan(4)
     const sourcePath = path.join(__dirname, 'source-dynamic.js')
