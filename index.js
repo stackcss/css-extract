@@ -32,13 +32,17 @@ function cssExtract (bundle, opts) {
 
     function write (chunk, enc, cb) {
       // Performance boost: don't do ast parsing unless we know it's needed
-      if (String(chunk.source).indexOf('insert-css') === -1) {
+      if (!/[insert\-css|sheetify\/insert]/.test(chunk.source)) {
         return cb(null, chunk)
       }
 
       var source = from2(chunk.source)
       var sm = staticModule({
         'insert-css': function (src) {
+          writeStream.write(String(src) + '\n')
+          return from2('null')
+        },
+        'sheetify/insert': function (src) {
           writeStream.write(String(src) + '\n')
           return from2('null')
         }
