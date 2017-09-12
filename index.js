@@ -32,7 +32,7 @@ function cssExtract (bundle, opts) {
 
     function write (chunk, enc, cb) {
       // Performance boost: don't do ast parsing unless we know it's needed
-      if (!/[insert\-css|sheetify\/insert]/.test(chunk.source)) {
+      if (!/(insert\-css|sheetify\/insert)/.test(chunk.source)) {
         return cb(null, chunk)
       }
 
