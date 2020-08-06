@@ -127,7 +127,6 @@ test('css-extract', function (t) {
     function readJs (err, data) {
       t.ifError(err, 'no error')
       const source = fs.readFileSync(sourcePath, 'utf8')
-      console.log(String(data), source)
       t.ok(String(data).indexOf(String(source)) !== -1, 'source is still in built bundle')
     }
   })
