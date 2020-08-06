@@ -1,9 +1,17 @@
+os: linux
+dist: bionic
+language: node_js
 node_js:
-  - stable
-  - 9
+  - 12
+  - 10
+  - 8
   - 6
   - 4
-sudo: false
-language: node_js
 script: "npm run test:cov"
-after_script: "npm i -g codecov.io && cat ./coverage/lcov.info | codecov"
+
+jobs:
+  include:
+    - node_js: stable
+      after_script: |
+        npm i -g codecov.io
+        cat ./coverage/lcov.info | codecov
