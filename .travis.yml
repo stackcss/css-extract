@@ -11,8 +11,8 @@ jobs:
   include:
     - node_js: stable
       after_script: |
-        npm i -g codecov.io
-        cat ./coverage/lcov.info | codecov
+        npm i -g codecov
+        npx nyc report --reporter=text-lcov | codecov --pipe
     # Node.js 6 is not supported by nyc, so run tests without code coverage
     - node_js: 6
       script: npm run test
