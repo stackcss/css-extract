@@ -2,6 +2,7 @@ const staticModule = require('static-module')
 const from2 = require('from2-string')
 const through = require('through2')
 const assert = require('assert')
+const d = require('defined')
 const bl = require('bl')
 const fs = require('fs')
 
@@ -13,6 +14,7 @@ function cssExtract (bundle, opts) {
   opts = opts || {}
 
   var outFile = opts.out || opts.o || 'bundle.css'
+  var sourceMap = d(opts.sourceMap, bundle && bundle._options && bundle._options.debug, false)
 
   assert.equal(typeof bundle, 'object', 'bundle should be an object')
   assert.equal(typeof opts, 'object', 'opts should be an object')
@@ -32,7 +34,7 @@ function cssExtract (bundle, opts) {
 
     function write (chunk, enc, cb) {
       // Performance boost: don't do ast parsing unless we know it's needed
-      if (!/[insert\-css|sheetify\/insert]/.test(chunk.source)) {
+      if (!/(insert-css|sheetify\/insert)/.test(chunk.source)) {
         return cb(null, chunk)
       }
 
@@ -46,7 +48,7 @@ function cssExtract (bundle, opts) {
           writeStream.write(String(src) + '\n')
           return from2('null')
         }
-      })
+      }, { sourceMap: sourceMap })
 
       source.pipe(sm).pipe(bl(complete))
 

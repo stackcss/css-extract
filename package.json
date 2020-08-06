@@ -1,6 +1,6 @@
 {
   "name": "css-extract",
-  "version": "1.2.0",
+  "version": "1.3.1",
   "description": "Extract CSS from a browserify bundle",
   "main": "index.js",
   "scripts": {
@@ -21,8 +21,9 @@
   "license": "MIT",
   "dependencies": {
     "bl": "^1.1.2",
+    "defined": "^1.0.0",
     "from2-string": "^1.1.0",
-    "static-module": "github:ahdinosaur/static-module#dynamic",
+    "static-module": "^3.0.0",
     "through2": "^2.0.1"
   },
   "devDependencies": {
