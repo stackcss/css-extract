@@ -16,8 +16,8 @@ function cssExtract (bundle, opts) {
   var outFile = opts.out || opts.o || 'bundle.css'
   var sourceMap = d(opts.sourceMap, bundle && bundle._options && bundle._options.debug, false)
 
-  assert.equal(typeof bundle, 'object', 'bundle should be an object')
-  assert.equal(typeof opts, 'object', 'opts should be an object')
+  assert.strictEqual(typeof bundle, 'object', 'bundle should be an object')
+  assert.strictEqual(typeof opts, 'object', 'opts should be an object')
 
   // every time .bundle is called, attach hook
   bundle.on('reset', addHooks)

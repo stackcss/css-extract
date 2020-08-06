@@ -33,7 +33,7 @@ test('css-extract', function (t) {
 
   t.test('should extract sheetify css to file', function (t) {
     t.plan(3)
-    tmpDir({unsafeCleanup: true}, onDir)
+    tmpDir({ unsafeCleanup: true }, onDir)
 
     function onDir (err, dir, cleanup) {
       t.ifError(err, 'no error')
