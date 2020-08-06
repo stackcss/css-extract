@@ -108,4 +108,26 @@ test('css-extract', function (t) {
       t.ok(String(data).indexOf(String(source)) !== -1, 'source is still in built bundle')
     }
   })
+
+  t.test('should not extract dynamic insert-css statements, again', function (t) {
+    t.plan(4)
+    const sourcePath = path.join(__dirname, 'source-dynamic-2.js')
+
+    browserify(sourcePath)
+      .plugin(cssExtract, { out: readCss })
+      .bundle(readJs)
+
+    function readCss () {
+      return bl(function (err, data) {
+        t.ifError(err, 'no error')
+        t.equal(String(data), '', 'no css extracted')
+      })
+    }
+
+    function readJs (err, data) {
+      t.ifError(err, 'no error')
+      const source = fs.readFileSync(sourcePath, 'utf8')
+      t.ok(String(data).indexOf(String(source)) !== -1, 'source is still in built bundle')
+    }
+  })
 })
