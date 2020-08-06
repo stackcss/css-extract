@@ -6,7 +6,7 @@
   "scripts": {
     "deps": "dependency-check . && dependency-check . --extra --no-dev",
     "test": "standard && npm run deps && NODE_ENV=test node test",
-    "test:cov": "standard && npm run deps && NODE_ENV=test istanbul cover ./test/index.js"
+    "test:cov": "standard && npm run deps && NODE_ENV=test nyc node test"
   },
   "repository": "stackcss/css-extract",
   "keywords": [
@@ -20,21 +20,21 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "bl": "^1.1.2",
+    "bl": "^4.0.2",
     "defined": "^1.0.0",
     "from2-string": "^1.1.0",
     "static-module": "^3.0.0",
-    "through2": "^2.0.1"
+    "through2": "^4.0.2"
   },
   "devDependencies": {
-    "browserify": "^13.0.0",
-    "dependency-check": "^2.5.1",
+    "browserify": "^16.5.2",
+    "dependency-check": "^2.10.1",
     "insert-css": "^2.0.0",
-    "istanbul": "^0.4.2",
-    "sheetify": "^6.0.0",
-    "standard": "^6.0.7",
-    "tape": "^4.5.0",
-    "tmp": "0.0.28"
+    "nyc": "^15.1.0",
+    "sheetify": "^8.0.0",
+    "standard": "^14.3.4",
+    "tape": "^5.0.1",
+    "tmp": "^0.2.1"
   },
   "files": [
     "index.js",
